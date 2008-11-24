@@ -1,0 +1,24 @@
+Redbox - a locally distributed musical instrument.
+
+Author:  Rick Bradley (rick@rickbradley.com)
+License: MIT
+
+Installation Notes:
+
+  (THIS IS NEVER INTENDED TO BE RUN ON WINDOWS.  DON'T EVEN ASK.)
+
+RabbitMQ:
+
+ * sudo port install erlang 
+
+Gems:
+
+ * sudo gem install midiator
+ * sudo gem install tmm1-amqp --source http://gems.github.com
+
+Prep:
+
+ * rake install_dependencies
+
+ ( launch rabbitmq )
+ * ERLANG_HOME=/opt/local/lib/erlang rake rabbitmq:start
