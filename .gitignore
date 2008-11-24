@@ -1,1 +1,2 @@
 spec/spec.opts
+run/rabbitmq
