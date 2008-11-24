@@ -1,4 +1,5 @@
 
+ * get rake spec working properly
  * probably should be testing these rake tasks (TATFT), dust this off
  * do we vendor some gems (e.g., rspec, mocha)
  * gem dependencies could go in the install_dependencies rake task
