@@ -1,0 +1,16 @@
+
+ * probably should be testing these rake tasks (TATFT), dust this off
+ * do we vendor some gems (e.g., rspec, mocha)
+ * gem dependencies could go in the install_dependencies rake task
+ * rake rabbitmq:start -- ensure that we localize all the ENV variables to run this
+ * autofind of erlang installation for use with rabbitmq startup
+ * rake rabbitmq:stop(!)
+ * simple ruby client to test rabbitmq functionality
+ * build metronome from rabbitmq
+ * class wrapper to run blocks on metronome beats
+ * output class
+ * midiator subclass for output
+ * build the ring artifact for song generation
+ * input class
+ * various input subclasses
+ * client script
