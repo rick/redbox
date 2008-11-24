@@ -1,3 +1,5 @@
+require 'test/unit'
+
 $:.unshift File.join(File.dirname(__FILE__), *%w[.. lib])
 
 # this is my favorite way to require, ever
