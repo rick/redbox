@@ -14,6 +14,7 @@ RabbitMQ:
 Gems:
 
  * sudo gem install midiator
+ * sudo gem install eventmachine
  * sudo gem install tmm1-amqp --source http://gems.github.com
 
 Prep:
