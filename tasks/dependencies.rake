@@ -1,8 +1,29 @@
 require 'fileutils'
 
 here   = File.dirname(__FILE__)
-vendor = File.expand_path(here + '/../vendor/')
 run    = File.expand_path(here + '/../run/')
+
+class RakeInstall
+  class << self
+    def is_installed?(path)
+      File.exists?(File.expand_path(File.dirname(__FILE__) + '/../' + path))
+    end
+
+    def unpack_tarball(path)
+      Dir.chdir(File.expand_path(File.dirname(__FILE__) + '/../run/'))
+      system("tar xvfz #{vendor}/#{path}")
+    end
+
+    def rename_server_path(source, target)
+      Dir.chdir(File.expand_path(File.dirname(__FILE__) + '/../run/'))
+      system("mv #{source} #{target}")
+    end
+
+    def vendor
+      File.expand_path(File.expand_path(File.dirname(__FILE__) + '/../vendor/'))
+    end
+  end
+end
 
 desc 'install dependencies'
 task :install_dependencies => [ :install_rabbit_mq ] do
@@ -11,14 +32,12 @@ end
 
 desc 'install the RabbitMQ message server'
 task :install_rabbit_mq do
-  target = File.expand_path(run+'/rabbitmq') 
-  if File.directory?(target)
-    puts "RabbitMQ already installed in [#{target}]"
+  target = 'run/rabbitmq'
+  if RakeInstall.is_installed?('run/rabbitmq')
+    puts "RabbitMQ already installed in [#{target}]."
   else
     puts "installing RabbitMQ in [#{target}]..."
-
-    tarball = vendor + '/rabbitmq-server*.tar.gz'
-    `cd #{run}; tar xfvz #{tarball}`
-    `cd #{run}; mv rabbitmq* rabbitmq`
+    RakeInstall.unpack_tarball('rabbitmq-server*.tar.gz')
+    RakeInstall.rename_server_path('rabbitmq_*', 'rabbitmq')
   end
 end
