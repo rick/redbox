@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'fileutils'
 require 'rake'
 
-describe 'rake tasks to setup for automated build' do
+describe 'rake tasks to install dependencies' do
   before :each do
     Rake.application = @rake = Rake::Application.new
     load File.expand_path(File.dirname(__FILE__) + '/../../tasks/dependencies.rake')
