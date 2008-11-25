@@ -1,8 +1,5 @@
 require 'fileutils'
 
-here   = File.dirname(__FILE__)
-run    = File.expand_path(here + '/../run/')
-
 class RakeInstall
   class << self
     def is_installed?(path)
