@@ -86,18 +86,8 @@ describe 'rake tasks to setup for automated build' do
   end
 
   describe 'when running install_dependencies' do
-    before :each do
-      stub(@rake["install_rabbit_mq"]).invoke
-    end
-    
-    def run_task
-      @rake["install_dependencies"].invoke
-    end
-
     it 'should install RabbitMQ' do
-      pending('learning how to set this mock expectation')
-      mock(@rake[:install_rabbit_mq]).invoke
-      @rake["install_dependencies"].invoke
+      @rake["install_dependencies"].prerequisites.should include("install_rabbit_mq")
     end
   end
 
