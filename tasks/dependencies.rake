@@ -7,17 +7,21 @@ class RakeInstall
     end
 
     def unpack_tarball(path)
-      Dir.chdir(File.expand_path(File.dirname(__FILE__) + '/../run/'))
+      Dir.chdir(run)
       system("tar xvfz #{vendor}/#{path}")
     end
 
     def rename_server_path(source, target)
-      Dir.chdir(File.expand_path(File.dirname(__FILE__) + '/../run/'))
+      Dir.chdir(run)
       system("mv #{source} #{target}")
     end
 
     def vendor
-      File.expand_path(File.expand_path(File.dirname(__FILE__) + '/../vendor/'))
+      File.expand_path(File.dirname(__FILE__) + '/../vendor/')
+    end
+
+    def run
+      File.expand_path(File.dirname(__FILE__) + '/../run/')
     end
   end
 end
@@ -30,7 +34,7 @@ end
 desc 'install the RabbitMQ message server'
 task :install_rabbit_mq do
   target = 'run/rabbitmq'
-  if RakeInstall.is_installed?('run/rabbitmq')
+  if RakeInstall.is_installed?(target)
     puts "RabbitMQ already installed in [#{target}]."
   else
     puts "installing RabbitMQ in [#{target}]..."
