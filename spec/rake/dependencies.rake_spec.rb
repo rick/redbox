@@ -107,7 +107,7 @@ describe 'rake tasks to setup for automated build' do
       end
 
       it 'should not rename the rabbitmq install server directory' do
-        mock(FileUtils).mv(anything, anything).never
+        mock(RakeInstall).rename_server_path(anything, anything).never
       end
     end
 
