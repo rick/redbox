@@ -13,6 +13,19 @@ class RabbitMQ
       ENV['LOG_BASE']      = "#{server}/../log/"
     end
 
+    def find_erlang_home
+      return ENV['ERLANG_HOME'] if ENV['ERLANG_HOME']
+
+      ENV['PATH'].split(':').each do |path|
+        p = File.expand_path(path)
+        if File.exists?("#{p}/erl")
+          lib = p.sub(%r{/bin(?:|/.*)/?$}, '/lib/erlang')
+          return lib if File.exists?(lib)
+        end
+      end
+      ''
+    end
+
     def start
       setup_environment
       Dir.chdir(File.expand_path(File.dirname(__FILE__) + '/../run/rabbitmq/sbin'))

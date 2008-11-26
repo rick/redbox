@@ -28,14 +28,76 @@ describe 'rake tasks to control rabbitmq server' do
     it 'should return false if rabbitmq is not running'
   end
 
-  describe 'settup up a localized rabbitmq environment' do
+  describe 'finding the erlang home path' do
+    it 'should work without arguments' do
+      lambda { RabbitMQ.find_erlang_home }.should_not raise_error(ArgumentError)
+    end
+
+    it 'should not allow arguments' do
+      lambda { RabbitMQ.find_erlang_home(:foo) }.should raise_error(ArgumentError)
+    end
+
+    describe 'when ERLANG_HOME is set in the environment' do
+      before :each do
+        @old_erlang_home, ENV['ERLANG_HOME'] = ENV['ERLANG_HOME'], '/path/to/erlang/home'
+      end
+
+      after :each do
+        ENV['ERLANG_HOME'] = @old_erlang_home
+      end
+
+      it 'should return the value of ERLANG_HOME' do
+        RabbitMQ.find_erlang_home.should == '/path/to/erlang/home'
+      end
+    end
+
+    describe 'when ERLANG_HOME is not set in the environment' do
+      before :each do
+        @path = '/path/to/foo/bin:/path/to/bar/bin:/path/to/baz/bin'
+        @old_erlang_home, ENV['ERLANG_HOME'] = ENV['ERLANG_HOME'], nil
+        @old_path, ENV['PATH'] = ENV['PATH'], @path
+        stub(File).exists?(anything) { false }
+      end
+
+      after :each do
+        ENV['ERLANG_HOME'] = @old_erlang_home
+        ENV['PATH'] = @old_path
+      end
+
+      it 'should look for erl in each PATH component' do
+        @path.split(':').each do |path|
+          mock(File).exists?("#{path}/erl") { false }
+        end
+        RabbitMQ.find_erlang_home
+      end
+
+      it 'should look for lib/erlang in PATH components with an erl binary' do
+        stub(File).exists?('/path/to/bar/bin/erl') { true }
+        mock(File).exists?('/path/to/foo/lib/erlang').never
+        mock(File).exists?('/path/to/bar/lib/erlang') { true }
+        RabbitMQ.find_erlang_home
+      end
+
+      it 'should return the path to lib/erlang' do
+        stub(File).exists?('/path/to/bar/bin/erl') { true }
+        stub(File).exists?('/path/to/bar/lib/erlang') { true }
+        RabbitMQ.find_erlang_home.should == '/path/to/bar/lib/erlang'      
+      end
+      
+      it 'should return the empty string when no erlang home can be found' do
+        RabbitMQ.find_erlang_home.should == ''
+      end
+    end
+  end
+
+  describe 'setting up a localized rabbitmq environment' do
     before :each do
       stub(RabbitMQ).find_erlang_home { '/path/to/erlang/home' }
       @server = File.expand_path(File.dirname(__FILE__) + '/../../run/')
       @old_erlang_home, ENV['ERLANG_HOME'] = ENV['ERLANG_HOME'], nil
       @old_rabbitmq_base, ENV['RABBITMQ_BASE'] = ENV['RABBITMQ_BASE'], nil
       @old_mnesia_base, ENV['MNESIA_BASE'] = ENV['MNESIA_BASE'], nil
-      @old_log_base, ENV['LOG_BASE'] = ENV['LOG_BASE'], nil      
+      @old_log_base, ENV['LOG_BASE'] = ENV['LOG_BASE'], nil
     end
 
     after :each do
@@ -44,7 +106,7 @@ describe 'rake tasks to control rabbitmq server' do
       ENV['MNESIA_BASE']   = @old_mnesia_base
       ENV['LOG_BASE']      = @old_log_base
     end
-    
+
     it 'should work without arguments' do
       lambda { RabbitMQ.setup_environment }.should_not raise_error(ArgumentError)
     end
@@ -75,17 +137,17 @@ describe 'rake tasks to control rabbitmq server' do
 
     it 'should set the LOG_BASE path' do
       RabbitMQ.setup_environment
-      ENV['LOG_BASE'].should == "#{@server}/../log/"      
+      ENV['LOG_BASE'].should == "#{@server}/../log/"
     end
   end
-  
+
   describe 'starting the rabbitmq server' do
     before :each do
       stub(RabbitMQ).system(anything)
       stub(RabbitMQ).setup_environment
       stub(Dir).chdir(anything)
     end
-    
+
     it 'should work without arguments' do
       lambda { RabbitMQ.start }.should_not raise_error(ArgumentError)
     end
