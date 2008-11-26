@@ -66,13 +66,21 @@ namespace :rabbitmq do
   task :start do
     raise "RabbitMQ server is not installed -- please run 'rake install_dependencies' first." unless
       RakeInstall.is_installed?('run/rabbitmq')
-    RabbitMQ.start unless RabbitMQ.running?
+    if RabbitMQ.running?
+      puts "RabbitMQ server is already running."
+    else
+      RabbitMQ.start
+    end
   end
 
   desc 'stop the rabbitmq server'
   task :stop do
     raise "RabbitMQ server is not installed -- please run 'rake install_dependencies' first." unless
       RakeInstall.is_installed?('run/rabbitmq')
-    RabbitMQ.stop if RabbitMQ.running?
+    if RabbitMQ.running?
+      RabbitMQ.stop
+    else
+      puts "RabbitMQ server is not running."
+    end
   end
 end

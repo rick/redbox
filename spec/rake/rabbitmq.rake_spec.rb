@@ -4,7 +4,7 @@ require 'rubygems'
 require 'mq'
 
 describe 'rake tasks to control rabbitmq server' do
-  before :each do
+  before :each do    
     Rake.application = @rake = Rake::Application.new
     load File.expand_path(File.dirname(__FILE__) + '/../../tasks/rabbitmq.rake')
   end
