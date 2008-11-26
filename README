@@ -16,10 +16,19 @@ Gems:
  * sudo gem install midiator
  * sudo gem install eventmachine
  * sudo gem install tmm1-amqp --source http://gems.github.com
+ 
+ ( for running specs:
+
+   * sudo gem install rspec
+   * sudo gem install mocha
+ )
+
 
 Prep:
 
  * rake install_dependencies
 
- ( launch rabbitmq )
- * ERLANG_HOME=/opt/local/lib/erlang rake rabbitmq:start
+Launch RabbitMQ:
+
+ * rake rabbitmq:start
+
