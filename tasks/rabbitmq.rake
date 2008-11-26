@@ -29,7 +29,13 @@ class RabbitMQ
     def start
       setup_environment
       Dir.chdir(File.expand_path(File.dirname(__FILE__) + '/../run/rabbitmq/sbin'))
-      system("./rabbitmq-server")
+      system("./rabbitmq-server -detached")
+    end
+
+    def stop
+      setup_environment
+      Dir.chdir(File.expand_path(File.dirname(__FILE__) + '/../run/rabbitmq/sbin'))
+      system("./rabbitmqctl stop")
     end
   end
 end
@@ -40,5 +46,12 @@ namespace :rabbitmq do
     raise "RabbitMQ server is not installed -- please run 'rake install_dependencies' first." unless
       RakeInstall.is_installed?('run/rabbitmq')
     RabbitMQ.start unless RabbitMQ.running?
+  end
+
+  desc 'stop the rabbitmq server'
+  task :stop do
+    raise "RabbitMQ server is not installed -- please run 'rake install_dependencies' first." unless
+      RakeInstall.is_installed?('run/rabbitmq')
+    RabbitMQ.stop if RabbitMQ.running?
   end
 end
