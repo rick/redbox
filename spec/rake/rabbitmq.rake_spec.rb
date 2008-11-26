@@ -4,7 +4,7 @@ require 'rubygems'
 require 'mq'
 
 describe 'rake tasks to control rabbitmq server' do
-  before :each do    
+  before :each do
     Rake.application = @rake = Rake::Application.new
     load File.expand_path(File.dirname(__FILE__) + '/../../tasks/rabbitmq.rake')
   end
@@ -17,7 +17,7 @@ describe 'rake tasks to control rabbitmq server' do
     before :each do
       stub(EM).run
     end
-  
+
     it 'should work without arguments' do
       lambda { RabbitMQ.ping }.should_not raise_error(ArgumentError)
     end
@@ -31,12 +31,12 @@ describe 'rake tasks to control rabbitmq server' do
       RabbitMQ.ping
     end
   end
-  
+
   describe 'determining if rabbitmq is running' do
     before :each do
       stub(RabbitMQ).ping
     end
-    
+
     it 'should work without arguments' do
       lambda { RabbitMQ.running? }.should_not raise_error(ArgumentError)
     end
@@ -59,7 +59,6 @@ describe 'rake tasks to control rabbitmq server' do
       stub(RabbitMQ).ping { raise AMQP::Error }
       RabbitMQ.should_not be_running
     end
-    
   end
 
   describe 'finding the erlang home path' do
@@ -115,9 +114,9 @@ describe 'rake tasks to control rabbitmq server' do
       it 'should return the path to lib/erlang' do
         stub(File).exists?('/path/to/bar/bin/erl') { true }
         stub(File).exists?('/path/to/bar/lib/erlang') { true }
-        RabbitMQ.find_erlang_home.should == '/path/to/bar/lib/erlang'      
+        RabbitMQ.find_erlang_home.should == '/path/to/bar/lib/erlang'
       end
-      
+
       it 'should return the empty string when no erlang home can be found' do
         RabbitMQ.find_erlang_home.should == ''
       end
@@ -189,17 +188,17 @@ describe 'rake tasks to control rabbitmq server' do
     it 'should not allow arguments' do
       lambda { RabbitMQ.stop(:foo) }.should raise_error(ArgumentError)
     end
-    
+
     it 'should determine if the rabbitmq server is running' do
       mock(RabbitMQ).running? { true }
       RabbitMQ.stop
     end
-    
+
     describe 'when the rabbitmq server is not running' do
       before :each do
         stub(RabbitMQ).running? { false }
       end
-      
+
       it 'should not stop the rabbitmq server' do
         mock(RabbitMQ).system(anything).never
         RabbitMQ.stop
@@ -210,17 +209,17 @@ describe 'rake tasks to control rabbitmq server' do
       before :each do
         stub(RabbitMQ).running? { true }
       end
-      
+
       it 'should configure the environment for localized running of rabbitmq' do
         mock(RabbitMQ).setup_environment
         RabbitMQ.stop
       end
-      
+
       it 'should stop the server from the rabbitmq sbin directory' do
         mock(Dir).chdir(File.expand_path(File.dirname(__FILE__) + '/../../run/rabbitmq/sbin/'))
         RabbitMQ.stop
       end
-      
+
       it 'should stop the rabbitmq server' do
         mock(RabbitMQ).system("./rabbitmqctl stop")
         RabbitMQ.stop
@@ -247,33 +246,33 @@ describe 'rake tasks to control rabbitmq server' do
       mock(RabbitMQ).running? { true }
       RabbitMQ.start
     end
-    
+
     describe 'when the rabbitmq server is already running' do
       before :each do
         stub(RabbitMQ).running? { true }
       end
-      
+
       it 'should not start the rabbitmq server' do
         mock(RabbitMQ).system(anything).never
         RabbitMQ.start
       end
     end
-    
+
     describe 'when the rabbitmq server is not running' do
       before :each do
         stub(RabbitMQ).running? { false }
       end
-      
+
       it 'should configure the environment for localized running of rabbitmq' do
         mock(RabbitMQ).setup_environment
         RabbitMQ.start
       end
-      
+
       it 'should run the server from the rabbitmq sbin directory' do
         mock(Dir).chdir(File.expand_path(File.dirname(__FILE__) + '/../../run/rabbitmq/sbin/'))
         RabbitMQ.start
       end
-      
+
       it 'should start the rabbitmq server' do
         mock(RabbitMQ).system("./rabbitmq-server")
         RabbitMQ.start
@@ -308,7 +307,7 @@ describe 'rake tasks to control rabbitmq server' do
       end
     end
   end
-   
+
   describe 'when running rabbitmq:start' do
     def run_task
       @rake["rabbitmq:start"].invoke
