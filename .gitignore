@@ -1,2 +1,5 @@
 spec/spec.opts
 run/rabbitmq
+run/mnesia
+log/*.log
+log/*.log.bak
