@@ -189,20 +189,42 @@ describe 'rake tasks to control rabbitmq server' do
     it 'should not allow arguments' do
       lambda { RabbitMQ.stop(:foo) }.should raise_error(ArgumentError)
     end
-
-    it 'should configure the environment for localized running of rabbitmq' do
-      mock(RabbitMQ).setup_environment
+    
+    it 'should determine if the rabbitmq server is running' do
+      mock(RabbitMQ).running? { true }
       RabbitMQ.stop
     end
-
-    it 'should stop the server from the rabbitmq sbin directory' do
-      mock(Dir).chdir(File.expand_path(File.dirname(__FILE__) + '/../../run/rabbitmq/sbin/'))
-      RabbitMQ.stop
+    
+    describe 'when the rabbitmq server is not running' do
+      before :each do
+        stub(RabbitMQ).running? { false }
+      end
+      
+      it 'should not stop the rabbitmq server' do
+        mock(RabbitMQ).system(anything).never
+        RabbitMQ.stop
+      end
     end
 
-    it 'should stop the rabbitmq server' do
-      mock(RabbitMQ).system("./rabbitmqctl stop")
-      RabbitMQ.stop
+    describe 'when the rabbitmq server is running' do
+      before :each do
+        stub(RabbitMQ).running? { true }
+      end
+      
+      it 'should configure the environment for localized running of rabbitmq' do
+        mock(RabbitMQ).setup_environment
+        RabbitMQ.stop
+      end
+      
+      it 'should stop the server from the rabbitmq sbin directory' do
+        mock(Dir).chdir(File.expand_path(File.dirname(__FILE__) + '/../../run/rabbitmq/sbin/'))
+        RabbitMQ.stop
+      end
+      
+      it 'should stop the rabbitmq server' do
+        mock(RabbitMQ).system("./rabbitmqctl stop")
+        RabbitMQ.stop
+      end
     end
   end
 
@@ -221,19 +243,41 @@ describe 'rake tasks to control rabbitmq server' do
       lambda { RabbitMQ.start(:foo) }.should raise_error(ArgumentError)
     end
 
-    it 'should configure the environment for localized running of rabbitmq' do
-      mock(RabbitMQ).setup_environment
+    it 'should determine if the rabbitmq server is running' do
+      mock(RabbitMQ).running? { true }
       RabbitMQ.start
     end
-
-    it 'should run the server from the rabbitmq sbin directory' do
-      mock(Dir).chdir(File.expand_path(File.dirname(__FILE__) + '/../../run/rabbitmq/sbin/'))
-      RabbitMQ.start
+    
+    describe 'when the rabbitmq server is already running' do
+      before :each do
+        stub(RabbitMQ).running? { true }
+      end
+      
+      it 'should not start the rabbitmq server' do
+        mock(RabbitMQ).system(anything).never
+        RabbitMQ.start
+      end
     end
-
-    it 'should start the rabbitmq server' do
-      mock(RabbitMQ).system("./rabbitmq-server")
-      RabbitMQ.start
+    
+    describe 'when the rabbitmq server is not running' do
+      before :each do
+        stub(RabbitMQ).running? { false }
+      end
+      
+      it 'should configure the environment for localized running of rabbitmq' do
+        mock(RabbitMQ).setup_environment
+        RabbitMQ.start
+      end
+      
+      it 'should run the server from the rabbitmq sbin directory' do
+        mock(Dir).chdir(File.expand_path(File.dirname(__FILE__) + '/../../run/rabbitmq/sbin/'))
+        RabbitMQ.start
+      end
+      
+      it 'should start the rabbitmq server' do
+        mock(RabbitMQ).system("./rabbitmq-server")
+        RabbitMQ.start
+      end
     end
   end
 
@@ -258,31 +302,9 @@ describe 'rake tasks to control rabbitmq server' do
         stub(RabbitMQ).stop
       end
 
-      it 'should determine if the rabbitmq server is running' do
-        mock(RabbitMQ).running? { true }
+      it 'should stop the rabbitmq server' do
+        mock(RabbitMQ).stop
         run_task
-      end
-
-      describe 'when the rabbitmq server is not running' do
-        before :each do
-          stub(RabbitMQ).running? { false }
-        end
-
-        it 'should not stop the rabbitmq server' do
-          mock(RabbitMQ).stop.never
-          run_task
-        end
-      end
-
-      describe 'when the rabbitmq server is running' do
-        before :each do
-          stub(RabbitMQ).running? { true }
-        end
-
-        it 'should stop the rabbitmq server' do
-          mock(RabbitMQ).stop
-          run_task
-        end
       end
     end
   end
@@ -308,31 +330,9 @@ describe 'rake tasks to control rabbitmq server' do
         stub(RabbitMQ).start
       end
 
-      it 'should determine if the rabbitmq server is running' do
-        mock(RabbitMQ).running? { true }
+      it 'should start the rabbitmq server' do
+        mock(RabbitMQ).start
         run_task
-      end
-
-      describe 'when the rabbitmq server is already running' do
-        before :each do
-          stub(RabbitMQ).running? { true }
-        end
-
-        it 'should not start the rabbitmq server' do
-          mock(RabbitMQ).start.never
-          run_task
-        end
-      end
-
-      describe 'when the rabbitmq server is not running' do
-        before :each do
-          stub(RabbitMQ).running? { false }
-        end
-
-        it 'should start the rabbitmq server' do
-          mock(RabbitMQ).start
-          run_task
-        end
       end
     end
   end
