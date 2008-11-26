@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'fileutils'
 require 'rake'
 
-describe 'rake tasks to install dependencies' do
+describe 'rake tasks to setup for automated build' do
   before :each do
     Rake.application = @rake = Rake::Application.new
     load File.expand_path(File.dirname(__FILE__) + '/../../tasks/dependencies.rake')
@@ -22,15 +22,15 @@ describe 'rake tasks to install dependencies' do
     end
     
     it 'should return true if the named path in our tree exists' do
-      RakeInstall.is_installed?(__FILE__).should be_true
+      RakeInstall.is_installed?('spec/spec_helper.rb').should be_true
     end
     
     it 'should return false if the named path in our tree does not exist' do
-      RakeInstall.is_installed?(__FILE__ + '-nonsensical.txt').should be_false
+      RakeInstall.is_installed?('spec/spec_helper-nonsensical.txt').should be_false
     end
 
     it 'should identify installed directories' do
-      RakeInstall.is_installed?(File.dirname(__FILE__)).should be_true
+      RakeInstall.is_installed?('spec').should be_true
     end
   end
 
