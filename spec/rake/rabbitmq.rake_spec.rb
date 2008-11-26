@@ -1,8 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'rake'
+require 'rubygems'
+require 'mq'
 
 describe 'rake tasks to control rabbitmq server' do
-
   before :each do
     Rake.application = @rake = Rake::Application.new
     load File.expand_path(File.dirname(__FILE__) + '/../../tasks/rabbitmq.rake')
@@ -12,7 +13,30 @@ describe 'rake tasks to control rabbitmq server' do
     Rake.application = nil
   end
 
+  describe 'pinging the rabbitmq server' do
+    before :each do
+      stub(EM).run
+    end
+  
+    it 'should work without arguments' do
+      lambda { RabbitMQ.ping }.should_not raise_error(ArgumentError)
+    end
+
+    it 'should not allow arguments' do
+      lambda { RabbitMQ.ping(:foo) }.should raise_error(ArgumentError)
+    end
+
+    it 'should set up an eventmachine loop to contact the server' do
+      mock(EM).run
+      RabbitMQ.ping
+    end
+  end
+  
   describe 'determining if rabbitmq is running' do
+    before :each do
+      stub(RabbitMQ).ping
+    end
+    
     it 'should work without arguments' do
       lambda { RabbitMQ.running? }.should_not raise_error(ArgumentError)
     end
@@ -21,11 +45,21 @@ describe 'rake tasks to control rabbitmq server' do
       lambda { RabbitMQ.running?(:foo) }.should raise_error(ArgumentError)
     end
 
-    it 'should attempt to connect to rabbitmq'
+    it 'should attempt to connect to rabbitmq' do
+      mock(RabbitMQ).ping
+      RabbitMQ.running?
+    end
 
-    it 'should return true if rabbitmq is running'
+    it 'should return true if rabbitmq is running' do
+      stub(RabbitMQ).ping { raise RuntimeError }
+      RabbitMQ.should be_running
+    end
 
-    it 'should return false if rabbitmq is not running'
+    it 'should return false if rabbitmq is not running' do
+      stub(RabbitMQ).ping { raise AMQP::Error }
+      RabbitMQ.should_not be_running
+    end
+    
   end
 
   describe 'finding the erlang home path' do
@@ -198,7 +232,7 @@ describe 'rake tasks to control rabbitmq server' do
     end
 
     it 'should start the rabbitmq server' do
-      mock(RabbitMQ).system("./rabbitmq-server -detached")
+      mock(RabbitMQ).system("./rabbitmq-server")
       RabbitMQ.start
     end
   end
