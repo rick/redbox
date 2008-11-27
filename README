@@ -32,3 +32,19 @@ Launch RabbitMQ:
 
  * rake rabbitmq:start
 
+
+References:
+
+ * http://www.rabbitmq.com
+ * http://github.com/tmm1/amqp/tree/master
+ * http://blog.bleything.net/2008/10/20/announcing-midiator
+ * http://www.toplap.org/index.php/Hacking_perl_in_nightclubs
+ * http://www.opencroquet.org/index.php/TeaTime_Architecture
+ * http://www.opencroquet.org/index.php/System_Overview#Island_Time
+ * http://github.com/mattly/ourouborous/tree/master
+ * http://github.com/gilesbowkett/archaeopteryx/tree/master
+ * http://www.funaba.org/en/ruby.html#osc
+ * http://hans.fugal.net/src/rosc/
+
+
+
