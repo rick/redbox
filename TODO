@@ -7,3 +7,52 @@
  * input class
  * various input subclasses
  * client script
+
+
+=== spiked metronome / client code:
+
+------<metronome.rb>---------
+require 'rubygems'
+
+require 'mq'
+
+EM.run do
+  EM.set_quantum(10)    # incredibly important for getting more than 10 ticks / second.
+
+  clock = MQ.new.fanout('clock')
+
+  i = 0
+  EM.add_periodic_timer(1.0/50.0) do
+      time = Time.now.to_f
+      i += 1
+      puts "...[#{i}][#{time.to_s}]" if i % 100 == 0
+      clock.publish(time)
+  end
+end
+
+-----------------------------
+
+--------<client.rb>----------
+
+require 'rubygems'
+
+require 'mq'
+
+EM.run do
+  client = MQ.new
+  last = 0.0
+  i = prev = 0
+  client.queue(Time.now.to_s).bind(client.fanout('clock')).subscribe do |time|
+    i += 1
+    delta = Time.now.to_f - time.to_f
+      if prev != time.to_i
+        puts "[#{i}] [#{time}] [#{time.to_f - last}] [#{delta}]"
+        i = 0
+        prev = time.to_i
+      end
+      last = time.to_f
+  end
+end
+
+
+----------------------------
