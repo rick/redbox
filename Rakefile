@@ -4,7 +4,7 @@
 #
 # == Authors
 #
-# * Ben Bleything <rick@rickbradley.com>
+# * Rick Bradley <rick@rickbradley.com>
 #
 # == Copyright
 #
